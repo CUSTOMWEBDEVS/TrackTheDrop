@@ -1,24 +1,8 @@
-export const el = {
-  video: document.getElementById('video') as HTMLVideoElement,
-  view: document.getElementById('view') as HTMLCanvasElement,
-  cameraSelect: document.getElementById('cameraSelect') as HTMLSelectElement,
-  resSelect: document.getElementById('resSelect') as HTMLSelectElement,
-  startBtn: document.getElementById('startBtn') as HTMLButtonElement,
-  stopBtn: document.getElementById('stopBtn') as HTMLButtonElement,
-  snapBtn: document.getElementById('snapBtn') as HTMLButtonElement,
-  showMask: document.getElementById('showMask') as HTMLInputElement,
-  debugHeat: document.getElementById('debugHeat') as HTMLInputElement,
-  thr: document.getElementById('thr') as HTMLInputElement,
-  thrVal: document.getElementById('thrVal') as HTMLSpanElement,
-  sens: document.getElementById('sens') as HTMLInputElement,
-  sensVal: document.getElementById('sensVal') as HTMLSpanElement,
-  morph: document.getElementById('morph') as HTMLInputElement,
-  morphVal: document.getElementById('morphVal') as HTMLSpanElement,
-  msg: document.getElementById('msg') as HTMLDivElement
-};
-
-export function bindSlider(sl: HTMLInputElement, label: HTMLSpanElement, cb: () => void) {
-  const render = () => { label.textContent = sl.value; cb(); };
-  sl.addEventListener('input', render);
-  render();
-}
+export const el:any={video:document.getElementById('video'),view:document.getElementById('view'),
+cameraSelect:document.getElementById('cameraSelect'),resSelect:document.getElementById('resSelect'),
+startBtn:document.getElementById('startBtn'),stopBtn:document.getElementById('stopBtn'),snapBtn:document.getElementById('snapBtn'),
+showMask:document.getElementById('showMask'),debugHeat:document.getElementById('debugHeat'),
+thr:document.getElementById('thr'),thrVal:document.getElementById('thrVal'),
+sens:document.getElementById('sens'),sensVal:document.getElementById('sensVal'),
+morph:document.getElementById('morph'),morphVal:document.getElementById('morphVal'),
+msg:document.getElementById('msg')};export function bindSlider(sl:any,label:any,cb:any){const render=()=>{label.textContent=sl.value;cb();};sl.addEventListener('input',render);render();}
