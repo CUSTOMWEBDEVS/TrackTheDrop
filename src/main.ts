@@ -4,7 +4,7 @@ import { processFrame } from './inlineProc';
 import type { FrameMsg, ResultMsg } from './workerTypes';
 
 let stream:MediaStream|null=null, anim:number|null=null;
-let worker:Worker|null=null, sending=false, useInline=false;
+let worker:Worker|null=null, sending=false, useInline=true; // default to inline for Pages reliability
 let W=640,H=480;
 
 function msg(s:string){console.log('[bt]',s); el.msg.textContent=s;}
@@ -13,8 +13,7 @@ async function populateCamerasAfterPermission(){
   try{
     const cams=await listCameras(); el.cameraSelect.innerHTML='';
     cams.forEach((d,i)=>{const o=document.createElement('option'); o.value=d.deviceId; o.textContent=d.label||`Camera ${i+1}`; el.cameraSelect.appendChild(o);});
-    if(cams.length===0) msg('No cameras found. Settings → Safari → Camera → Allow for this site.');
-    else msg('');
+    if(cams.length===0) msg('No cameras found. Settings → Safari → Camera → Allow for this site.'); else msg('Ready.');
   }catch(e:any){ msg('enumerateDevices failed: '+e?.message); }
 }
 
@@ -38,18 +37,17 @@ async function start(){
   el.view.width = vw; el.view.height = vh;
   await populateCamerasAfterPermission();
 
-  // Try module worker, fall back to inline
+  // Try module worker as upgrade (but inline by default)
   try{
     worker = new Worker(new URL('./worker.ts', import.meta.url), { type:'module' });
     worker.onmessage = onWorker;
     useInline = false;
   }catch(e){
-    console.warn('Worker failed, using inline processing', e);
     worker = null; useInline = true;
   }
 
   el.startBtn.disabled=true; el.stopBtn.disabled=false; el.snapBtn.disabled=false;
-  msg('');
+  msg('Streaming…');
   tick();
 }
 
@@ -57,6 +55,7 @@ function stop(){
   if(anim!==null) cancelAnimationFrame(anim); anim=null;
   if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
   el.startBtn.disabled=false; el.stopBtn.disabled=true; el.snapBtn.disabled=true;
+  msg('Stopped.');
 }
 
 async function tick(){
@@ -88,14 +87,12 @@ function snapshot(){ const a=document.createElement('a'); a.download=`bloodtrack
 
 function registerServiceWorker(){
   if('serviceWorker' in navigator){
-    const swUrl = `${import.meta.env.BASE_URL}sw.js`; navigator.serviceWorker.register(swUrl).catch(e=>console.warn('SW',e));
+    const swUrl = `${import.meta.env.BASE_URL}sw.js`; navigator.serviceWorker.register(swUrl).catch(e=>{});
   }
 }
 
 async function init(){
-  if(!('mediaDevices' in navigator)){ alert('Camera not supported on this browser.'); return; }
-  if(!supportOffscreen()) console.warn('OffscreenCanvas not available; performance may be lower.');
-  el.msg.textContent = 'On iPhone: Safari over HTTPS → tap Start → Allow. If no prompt, Settings → Safari → Camera.';
+  el.msg.textContent = 'JS loaded. On iPhone: Safari over HTTPS → Start → Allow.';
   el.startBtn.onclick = start; el.stopBtn.onclick = stop; el.snapBtn.onclick = snapshot;
   bindSlider(el.thr,el.thrVal,()=>{}); bindSlider(el.sens,el.sensVal,()=>{}); bindSlider(el.morph,el.morphVal,()=>{});
   registerServiceWorker();
