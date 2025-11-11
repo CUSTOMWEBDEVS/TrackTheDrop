@@ -13,7 +13,8 @@ export const el = {
   sens: document.getElementById('sens') as HTMLInputElement,
   sensVal: document.getElementById('sensVal') as HTMLSpanElement,
   morph: document.getElementById('morph') as HTMLInputElement,
-  morphVal: document.getElementById('morphVal') as HTMLSpanElement
+  morphVal: document.getElementById('morphVal') as HTMLSpanElement,
+  msg: document.getElementById('msg') as HTMLDivElement
 };
 
 export function bindSlider(sl: HTMLInputElement, label: HTMLSpanElement, cb: () => void) {

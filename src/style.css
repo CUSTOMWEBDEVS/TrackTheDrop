@@ -46,3 +46,5 @@ video, canvas {
 }
 
 footer { color: var(--muted); }
+
+.msg { color: #ffd166; margin-top: 8px; font-size: 13px; }

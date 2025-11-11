@@ -9,19 +9,24 @@ let sending = false;
 
 let W = 640, H = 480;
 
-async function populateCameras() {
+async function populateCamerasAfterPermission() {
   try {
-    const s = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-    s.getTracks().forEach(t => t.stop());
-  } catch {}
-  const cams = await listCameras();
-  el.cameraSelect.innerHTML = '';
-  cams.forEach((d, i) => {
-    const opt = document.createElement('option');
-    opt.value = d.deviceId;
-    opt.textContent = d.label || `Camera ${i+1}`;
-    el.cameraSelect.appendChild(opt);
-  });
+    const cams = await listCameras();
+    el.cameraSelect.innerHTML = '';
+    if (cams.length === 0) {
+      el.msg.textContent = 'Grant camera permission, then camera list will populate.';
+      return;
+    }
+    cams.forEach((d, i) => {
+      const opt = document.createElement('option');
+      opt.value = d.deviceId;
+      opt.textContent = d.label || `Camera ${i+1}`;
+      el.cameraSelect.appendChild(opt);
+    });
+    el.msg.textContent = '';
+  } catch (err) {
+    el.msg.textContent = 'Could not list cameras: ' + (err as any)?.message;
+  }
 }
 
 function getParams() {
@@ -39,17 +44,27 @@ async function start() {
   const deviceId = el.cameraSelect.value || undefined;
   const { width, height } = parseRes(el.resSelect.value);
   W = width; H = height;
-  stream = await navigator.mediaDevices.getUserMedia({
-    video: {
-      deviceId: deviceId ? { exact: deviceId } : undefined,
-      width: { ideal: width },
-      height: { ideal: height },
-      facingMode: deviceId ? undefined : 'environment'
-    },
-    audio: false
-  });
+
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        deviceId: deviceId ? { exact: deviceId } : undefined,
+        width: { ideal: width },
+        height: { ideal: height },
+        facingMode: deviceId ? undefined : 'environment'
+      },
+      audio: false
+    });
+  } catch (err) {
+    el.msg.textContent = 'Camera error: ' + (err as any)?.message + '. On iOS, open in Safari over HTTPS and tap Start.';
+    return;
+  }
+
   el.video.srcObject = stream;
   await el.video.play();
+
+  // now we can list cameras (iOS requires permission first)
+  populateCamerasAfterPermission();
 
   el.startBtn.disabled = true;
   el.stopBtn.disabled = false;
@@ -120,8 +135,10 @@ function snapshot() {
 
 function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
-    // Resolve under Vite's base path automatically
-    navigator.serviceWorker.register(new URL('sw.js', import.meta.url)).catch(() => {});
+    const swUrl = `${import.meta.env.BASE_URL}sw.js`;
+    navigator.serviceWorker.register(swUrl).catch((e) => {
+      console.warn('SW register failed', e);
+    });
   }
 }
 
@@ -133,7 +150,9 @@ async function init() {
   if (!supportOffscreen()) {
     console.warn('OffscreenCanvas not available; performance may be lower.');
   }
-  await populateCameras();
+
+  // iOS Safari won't show camera names before permission; show a hint
+  el.msg.textContent = 'Tap Start and allow camera. Then the camera list will populate.';
 
   el.startBtn.onclick = start;
   el.stopBtn.onclick = stop;

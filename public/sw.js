@@ -1,4 +1,4 @@
-// Simple cache-first service worker (paths resolved by Vite base)
+// Simple cache-first service worker
 self.addEventListener('install', (e) => {
   e.waitUntil((async () => {
     const cache = await caches.open('bt-cache-v1');

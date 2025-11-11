@@ -1,24 +1,15 @@
-# Blood Tracker (PWA)
+# Blood Tracker (PWA) — GH Pages Patch
 
-Installable web app that highlights suspected blood from the live camera feed. Built with Vite + TypeScript.
+- iOS-friendly permission flow: camera list populates **after** you tap Start and grant permission.
+- Visible message area shows errors.
+- Service worker path fixed for GitHub Pages (`${import.meta.env.BASE_URL}sw.js`).
 
 ## Dev
-```bash
 npm install
 npm run dev
-```
 
 ## Build
-```bash
 npm run build
-```
 
-## Deploy to GitHub Pages
-This repo is preconfigured for Pages under the repo name `blood-tracker-pwa`.
-
-1. Push the repo to GitHub.
-2. Build: `npm run build` (creates `dist/`)
-3. Publish `dist/` to `gh-pages` branch.
-4. Enable Pages in GitHub Settings → Pages → Branch: `gh-pages`
-
-Your site: `https://<USER>.github.io/blood-tracker-pwa/`
+## Deploy
+Push to GitHub and enable Pages via Actions or push `dist/` to `gh-pages`.
