@@ -1,1 +1,1 @@
-{ "name":"Blood Tracker (PWA)","short_name":"BloodTracker","description":"Highlight suspected blood in the field using your phone camera.","start_url":".","display":"standalone","background_color":"#0b0f14","theme_color":"#0b0f14","icons":[]}
+{ "name":"Blood Tracker (PWA)","short_name":"BloodTracker","start_url":".","display":"standalone","background_color":"#0b0f14","theme_color":"#0b0f14","icons":[]}
